@@ -17,20 +17,20 @@ comment: |
 variable name: interview_metadata["namechangela"]
 data:
   al_weaver_version: "1.7.0"
-  generated on: "2022-09-19"
+  generated on: "2022-09-25"
   title: >-
     Name Change of a Minor in Louisiana
   short title: >-
     Name Change of a Minor in Louisiana
   description: |-
-    This form is intended for individuals seeking to legally change their first and/or last name who are younger than 18
+    This form is intended for individuals seeking to legally change their first and/or last name who are younger than 18.
   original_form: >-
     
   allowed courts: 
     - "District Court"
   categories:
-    - "FA-00-00-00-00"
     - "ES-00-00-00-00"
+    - "FA-00-00-00-00"
   typical role: "plaintiff"
   generate download screen: True
 ---
@@ -56,7 +56,7 @@ code: |
 ---
 objects:
   - users: ALPeopleList.using(there_are_any=True)
-  - court_list: ALCourtLoader.using(file_name='JDCs_by_Parish_2.csv')
+  - court_list: ALCourtLoader.using(file_name='JDCs_by_parish.xlsx')
 ---
 sections:
   - review_namechangela: Review your answers
@@ -70,11 +70,12 @@ code: |
   allowed_courts = interview_metadata["namechangela"]["allowed courts"]
   nav.set_section('review_namechangela')
   user_role = 'plaintiff'
-  RS_134751
+  RS_134751__Petition_for_name_change
+  trial_court_index
   PArent_first_name
   child_first_name
   set_progress(33)
-  trial_court_index
+  basic_questions_signature_flow
   interview_order_namechangela = True
 ---
 ###################### Main order ######################
@@ -113,12 +114,10 @@ subquestion: |
   1.	Your social security number
   2.	The necessary court costs by cash or check.
 ---
-id: RS 13 4751
+id: RS 13 4751 Petition for name change
 question: |
-  RS 13:4751
+  RS 13:4751 - Petition for name change
 subquestion: |
-  Petition for name change; adults; minors:
-  
   A. The name of a person may be changed as provided in this Section.
   B. Whenever any person who has attained the age of majority desires to change his name, he shall present a petition to the district court of the parish of his residence, the parish of his birth, or the parish of venue for the Vital Records Registry, or, in the case of a person incarcerated in a penal institution, to the district court of the parish in which he was sentenced, setting forth the reasons for the desired change.
   C. If the person desiring such change is a minor or if the parents or parent or the tutor of the minor desire to change the name of the minor:
@@ -132,63 +131,17 @@ subquestion: |
   (4) The petition may be signed by either the mother or the father acting alone if a child has been given a surname which is different from that authorized in R.S. 40:34(B)(1)(a).
   D.(1) A person who has been convicted of a felony shall not be entitled to petition for a change of name under the provisions of this Section until his sentence has been satisfied. This Subsection shall apply whether the offender is actually imprisoned or on probation or parole.
   (2) Notwithstanding the provisions of Paragraph (1) of this Subsection or any other provision of law to the contrary, a person convicted of any felony enumerated in R.S. 14:2(B) shall not be entitled to petition for a change of name.
-continue button field: RS_134751
+continue button field: RS_134751__Petition_for_name_change
 ---
-id: Parent and Guardian info
+id: Parent Guardian Information
 question: |
   Parent/Guardian Information
 fields:
   - "First name:": PArent_first_name
   - "Middle name:": PArent_Middle_name
   - "Last name:": PArent_LAst_name
-  - "Are you the parent of the child whose name you want to change?": user_is_childs_parent
-    datatype: yesnoradio
-  - "If no, are you the child’s tutor (i.e.  guardian)?": user_is_childs_tutor
-    datatype: yesnoradio
-    show if: user_is_childs_parent = 'No'
-  - "Are both parents of the child living? NOTE: If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.": are_both_parents_living
-    datatype: yesnoradio
-  - "Are the parents in agreement with changing the child’s name?": agreement_between_parents
-    datatype: yesnoradio
-  - "If yes, will the other parent sign the petition for the name change?": will_other_parent_sign
-    show if: agreement_between_parents = 'Yes'
-    datatype: yesnoradio
-  - "If no, will the other parent provide a letter approving the child’s name change?": will_other_parent_provide
-    datatype: yesnoradio
-    show if: agreement_between_parents = 'No'
-  - "If no, have you been granted legal custody of the child by a court of law?": legal_custody
-    datatype: yesnoradio
-    show if: will_other_parent_provide = 'No'
-  - "If yes, has the other parent been served with a copy of the petition? If no, Stop.  Seek the assistance of an attorney. NOTE: If you have been awarded custody of the child, you may have to provide a a copy of the court order and other proof of nonsupport and/or parental involvement by the other parent.": copy_of_petition
-    datatype: yesnoradio
-    show if: will_other_parent_provide = 'Yes'
-  - "Have the other parent’s parental rights for the child been stopped by a court of law? NOTE: If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.": parental_rights
-    datatype: yesnoradio
-  - "Are you incarcerated, on parole, or on probation? If yes, stop.  Seek the assistance of an attorney.": incarcerated_parole_or_probation
-    datatype: yesnoradio
-  - "Have you been convicted of a crime? If yes, Stop.  Seek the assistance of an attorney.": covicted
-    datatype: yesornoradio
-  - "Are you responsible for paying child support?": child_support
-    datatype: yesnoradio
-  - "If yes, are your child support obligations satisfied/up-to-date? If no, Stop. Seek the assistance of an attorney. NOTE: You may have to provide copies of ALL child support orders and summaries.": child_support_obligations
-    show if: child_support = 'Yes'
-  - "Phone number (###-###-####):": telephone_number
-  - "Parent/Guardian signature:": parent_signature
-    input type: signature
-  - "Parent/Guardian signature:": parent_signature1
-    input type: signature 
----
-id: Child Information
-question: |
-  Child Information
-fields:
-  - "First name:": child_first_name
-  - "Middle name:": child_middle_name
-  - "Last name:": child_last_name
-  - "SSN(###-##-####):": social_security_number
-  - "Birthdate:": child_birthdate
-    datatype: date
-  - "Address": address
+  - "Phone:": telephone_number
+  - "Address:": address
   - "City:": city
   - "State": state
     input type: dropdown
@@ -242,28 +195,169 @@ fields:
       - 'Washington'
       - 'West Virginia'
       - 'Wisconsin'
-      - 'Wyoming'
+      -  'Wyoming'
   - "Zip code:": zip_code
     datatype: integer
     min: 0
+  - "Are you the parent of the child whose name you want to change?": are_you_the_parent
+    datatype: yesnoradio
+  - "If no, are you the child’s tutor (i.e.  guardian)?": are_you_the_tutor
+    datatype: yesnoradio
+    show if:
+      variable: are_you_the_parent
+      is: False
+  - "Are both parents of the child living? NOTE: If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.": are_both_parents_living
+    datatype: yesnoradio
+  - "If yes, are they married?": are_they_married
+    datatype: yesnoradio
+    show if:
+      variable: are_both_parents_living
+      is: True
+  - "Are the parents in agreement with changing the child’s name?": parent_agreement
+    datatype: yesnoradio
+  - "If yes, will the other parent sign the petition for the name change?": will_the_other_parent_sign
+    datatype: yesnoradio
+    show if:
+      variable: parent_agreement
+      is: True
+  - "If no, will the other parent provide a letter approving the child’s name change?": will_other_parent_provide_a_letter
+    datatype: yesnoradio
+    show if:
+      variable: will_the_other_parent_sign
+      is: False
+  - "If no, have you been granted legal custody of the child by a court of law?": granted_legal_custody
+    datatype: yesnoradio
+    show if:
+      variable: will_other_parent_provide_a_letter
+      is: False
+  - "If yes, has the other parent been served with a copy of the petition? If no, Stop.  Seek the assistance of an attorney.": copy_of_the_petition
+    datatype: yesnoradio
+    show if:
+      variable: granted_legal_custody
+      is: True
+  - "If yes, does either of the following situations apply: (Check one)": parent_checklist
+    datatype: checkboxes
+    choices:
+      - 'The other parent has refused or failed to comply with a court order of support for a period of one year.'
+      - 'The other parent has failed to support the child for a period of three years after judgment awarding custody to the parent signing the petition.'
+      - 'The other parent is not paying support and has refused or failed to visit, communicate, or attempt to communicate with the child without just cause for a period of two years.'
+  - "Have the other parent’s parental rights for the child been stopped by a court of law? NOTE: If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.": parent_rights_been_stopped
+    datatype: yesnoradio
+    show if:
+      variable: copy_of_petition
+      is: True
+  - "Are you incarcerated, on parole, or on probation?": incarcerated_parole_probation
+    datatype: yesnoradio
+  - "Have you been convicted of a crime? If yes, stop.  Seek the assistance of an attorney.": convicted
+    datatype: yesnoradio
+  - "Are you responsible for paying child support?": paying_child_support
+    datatype: yesnoradio
+  - "If yes, are your child support obligations satisfied/up-to-date? If no, Stop. Seek the assistance of an attorney. NOTE: You may have to provide copies of ALL child support orders and summaries.": child_support_obligations
+    datatype: yesnoradio
+    show if:
+      variable: paying_child_support
+      is: True
+---
+id: Minor Information
+question: |
+  Minor Information
+fields:
+  - "First name:": child_first_name
+  - "Middle name:": child_middle_name
+  - "Last name:": child_last_name
+  - "Birthdate:": child_birthdate
+    datatype: date
+  - "SSN (###-##-####):": social_security_number
   - "New first name:": new_first_name
   - "New middle name:": new_middle_name
   - "New last name:": new_last_name
   - "Name change reason:": name_change_reason
-  - "Parish of residence:": child_domicile
+  - "Domicile:": child_domicile
+    input type: dropdown
+    choices:
+      - 'Acadia'
+      - 'Allen'
+      - 'Ascension'
+      - 'Assumption'
+      - 'Avoyelles'
+      - 'Beauregard'
+      - 'Bienville'
+      - 'Bossier'
+      - 'Caddo'
+      - 'Calcasieu'
+      - 'Caldwell'
+      - 'Cameron'
+      - 'Catahoula'
+      - 'Claiborne'
+      - 'Concordia'
+      - 'De Soto'
+      - 'East Baton Rouge'
+      - 'East Carroll'
+      - 'East Feliciana'
+      - 'Evangeline'
+      - 'Franklin'
+      - 'Grant'
+      - 'Iberia'
+      - 'Iberville'
+      - 'Jackson'
+      - 'Jefferson'
+      - 'Jefferson Davis'
+      - 'La Salle'
+      - 'Lafayette'
+      - 'Lafourche'
+      - 'Lincoln'
+      - 'Livingston'
+      - 'Madison'
+      - 'Morehouse'
+      - 'Natchitoches'
+      - 'Orleans'
+      - 'Ouachita'
+      - 'Plaquemines'
+      - 'Pointe Coupee'
+      - 'Rapides'
+      - 'Red River'
+      - 'Richland'
+      - 'Sabine'
+      - 'St. Bernard'
+      - 'St. Charles'
+      - 'St. Helena'
+      - 'St. James'
+      - 'St. John The Baptist'
+      - 'St. Landry'
+      - 'St. Martin'
+      - 'St. Mary'
+      - 'St. Tammany'
+      - 'Tangipahoa'
+      - 'Tensas'
+      - 'Terrebonne'
+      - 'Union'
+      - 'Vermilion'
+      - 'Vernon'
+      - 'Washington'
+      - 'Webster'
+      - 'West Baton Rouge'
+      - 'West Carroll'
+      - 'West Feliciana'
+      - 'Winn'
 ---
-id: filing parish
+id: Filing Options
 question: |
-  In which parish will you file this case?
-fields:  
+  In what parish would you like to file your petition?
+subquestion: |
+  A petition for a name change can only be filed in the parish of the minor's birth place, the parish where the minor resides, or the parish of Vital Records (Orleans Parish).
+fields:
   - no label: trial_court_index
     code: |
       court_list.filter_courts(None)
 ---
 code: |
-  trial_court = court_list.as_court( 'trial_court' , trial_court_index)
+  trial_court = court_list.as_court('trial_court', trial_court_index[0])
+#  'District court:': district_court1
+#  - 'Judicial District:': judicial_district1
+#  - 'District Attorney:': district_attorney1
+#  - "Parent/Guardian signature:": parent1_signature
+#  - "Parent/Guardian signature:": parent2_signature
 ---
-
 id: preview namechangela
 question: |
   Preview your form before you sign it
@@ -281,7 +375,10 @@ subquestion: |
 continue button field: namechangela_preview_question    
 ---
 code: |
-  signature_fields = []
+  signature_fields = ["parent1.signature"]
+---
+code: |
+  signature_fields = ["parent2_signature"]
 ---
 code: |
   # This is a placeholder for the addresses that will be searched
@@ -298,150 +395,158 @@ review:
     button: |
       **Last name:**:
       ${ PArent_LAst_name }
-  - Edit: zip_code
+  - Edit: are_you_the_tutor
     button: |
-      **Zip code:**:
-      ${ zip_code }
-  - Edit: father_signature
+      **If no, are you the child’s tutor (i.e.  guardian)?**:
+      ${ are_you_the_tutor }
+  - Edit: will_the_other_parent_sign
     button: |
-      **Father signature:**:
-      > ${ single_paragraph(father_signature) }
-  - Edit: answer11
-    button: |
-      **2. Have you been convicted of a crime? If yes, Stop.  Seek the assistance of an attorney.**:
-      ${ word(yesno(answer11)) }
-  - Edit: answer6
-    button: |
-      **If no, will the other parent provide a letter approving the child’s name change?**:
-      ${ answer6 }
-  - Edit: new_first_name
-    button: |
-      **New first name:**:
-      ${ new_first_name }
-  - Edit: answer7
-    button: |
-      **If no, have you been granted legal custody of the child by a court of law?**:
-      ${ answer7 }
+      **If yes, will the other parent sign the petition for the name change?**:
+      ${ will_the_other_parent_sign }
   - Edit: social_security_number
     button: |
-      **SSN(###-##-####):**:
+      **SSN (###-##-####):**:
       ${ social_security_number }
-  - Edit: city
-    button: |
-      **City:**:
-      ${ city }
-  - Edit: PArent_first_name
-    button: |
-      **First name:**:
-      ${ PArent_first_name }
-  - Edit: child_birthdate
-    button: |
-      **Birthdate:**:
-      ${ child_birthdate }
-  - Edit: district_court1
-    button: |
-      **District court:**:
-      ${ district_court1 }
   - Edit: new_middle_name
     button: |
       **New middle name:**:
       ${ new_middle_name }
-  - Edit: answer9
-    button: |
-      **4. Have the other parent’s parental rights for the child been stopped by a court of law? NOTE: If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.**:
-      ${ word(yesno(answer9)) }
-  - Edit: answer1
-    button: |
-      **1. Are you the parent of the child whose name you want to change?**:
-      ${ answer1 }
-  - Edit: child_last_name
-    button: |
-      **Last name:**:
-      ${ child_last_name }
-  - Edit: parent_signature1
-    button: |
-      **Parent signature:**:
-      > ${ single_paragraph(mother_signature) }
-  - Edit: answer12
-    button: |
-      **3. Are you responsible for paying child support?**:
-      ${ answer12 }
-  - Edit: child_first_name
-    button: |
-      **First name:**:
-      ${ child_first_name }
-  - Edit: telephone_number
-    button: |
-      **Phone number (###-###-####):**:
-      ${ telephone_number }
-  - Edit: answer4
-    button: |
-      **3. Are the parents in agreement with changing the child’s name?**:
-      ${ word(yesno(answer4)) }
-  - Edit: child_middle_name
-    button: |
-      **Middle name:**:
-      ${ child_middle_name }
-  - Edit: answer5
-    button: |
-      **If yes, will the other parent sign the petition for the name change?**:
-      ${ word(yesno(answer5)) }
-  - Edit: answer2
-    button: |
-      **If no, are you the child’s tutor (i.e.  guardian)?**:
-      ${ word(yesno(answer2)) }
-  - Edit: answer10
-    button: |
-      **1. Are you incarcerated, on parole, or on probation? If yes, stop.  Seek the assistance of an attorney.**:
-      ${ word(yesno(answer10)) }
   - Edit: name_change_reason
     button: |
       **Name change reason:**:
       ${ name_change_reason }
-  - Edit: child_domicile
+  - Edit: parent1_signature
     button: |
-      **Parish of residence:**:
-      ${ child_domicile }
-  - Edit: judicial_district1
+      **Parent/Guardian signature:**:
+      ${ parent1_signature }
+  - Edit: new_first_name
     button: |
-      **Judicial district:**:
-      ${ judicial_district1 }
-  - Edit: address
+      **New first name:**:
+      ${ new_first_name }
+  - Edit: parent2_signature
     button: |
-      **Address**:
-      ${ address }
+      **Parent/Guardian signature:**:
+      ${ parent2_signature }
+  - Edit: parent_agreement
+    button: |
+      **Are the parents in agreement with changing the child’s name?**:
+      ${ parent_agreement }
+  - Edit: district_court1
+    button: |
+      **District court:**:
+      ${ district_court1 }
+  - Edit: paying_child_support
+    button: |
+      **Are you responsible for paying child support?**:
+      ${ paying_child_support }
   - Edit: new_last_name
     button: |
       **New last name:**:
       ${ new_last_name }
-  - Edit: state
+  - Edit: child_middle_name
     button: |
-      **State**:
-      ${ state }
-  - Edit: answer3
+      **Middle name:**:
+      ${ child_middle_name }
+  - Edit: parent_checklist
     button: |
-      **Are both parents of the child living? NOTE: If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.**:
-      ${ word(yesno(answer3)) }
-  - Edit: answer8
-    button: |
-      **If yes, has the other parent been served with a copy of the petition? If no, Stop.  Seek the assistance of an attorney. NOTE: If you have been awarded custody of the child, you may have to provide a a copy of the court order and other proof of nonsupport and/or parental involvement by the other parent.**:
-      ${ answer8 }
-  - Edit: answer13
-    button: |
-      **If yes, are your child support obligations satisfied/up-to-date? If no, Stop. Seek the assistance of an attorney. NOTE: You may have to provide copies of ALL child support orders and summaries.**:
-      ${ answer13 }
+      **If yes, does either of the following situations apply: (Check one)**:
+      ${ parent_checklist }
   - Edit: PArent_Middle_name
     button: |
       **Middle name:**:
       ${ PArent_Middle_name }
+  - Edit: are_both_parents_living
+    button: |
+      **Are both parents of the child living? NOTE: If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.**:
+      ${ are_both_parents_living }
+  - Edit: child_domicile
+    button: |
+      **Domicile:**:
+      ${ child_domicile }
+  - Edit: child_last_name
+    button: |
+      **Last name:**:
+      ${ child_last_name }
+  - Edit: zip_code
+    button: |
+      **Zip code:**:
+      ${ zip_code }
+  - Edit: state
+    button: |
+      **State**:
+      ${ state }
+  - Edit: will_other_parent_provide_a_letter
+    button: |
+      **If no, will the other parent provide a letter approving the child’s name change?**:
+      ${ will_other_parent_provide_a_letter }
+  - Edit: copy_of_the_petition
+    button: |
+      **If yes, has the other parent been served with a copy of the petition? If no, Stop.  Seek the assistance of an attorney.**:
+      ${ copy_of_the_petition }
+  - Edit: judicial_district1
+    button: |
+      **Judicial District:**:
+      ${ judicial_district1 }
+  - Edit: telephone_number
+    button: |
+      **Phone(###-###-####):**:
+      ${ telephone_number }
+  - Edit: PArent_first_name
+    button: |
+      **First name:**:
+      ${ PArent_first_name }
+  - Edit: incarcerated_parole_probation
+    button: |
+      **Are you incarcerated, on parole, or on probation?**:
+      ${ incarcerated_parole_probation }
+  - Edit: child_first_name
+    button: |
+      **First name:**:
+      ${ child_first_name }
+  - Edit: child_birthdate
+    button: |
+      **Birthdate:**:
+      ${ child_birthdate }
+  - Edit: convicted
+    button: |
+      **Have you been convicted of a crime? If yes, stop.  Seek the assistance of an attorney.**:
+      ${ convicted }
+  - Edit: district_attorney1
+    button: |
+      **District Attorney:**:
+      ${ district_attorney1 }
+  - Edit: are_they_married
+    button: |
+      **If yes, are they married?**:
+      ${ are_they_married }
+  - Edit: city
+    button: |
+      **City:**:
+      ${ city }
+  - Edit: are_you_the_parent
+    button: |
+      **Are you the parent of the child whose name you want to change?**:
+      ${ are_you_the_parent }
   - Edit: filing_parish1
     button: |
       **Filing parish:**:
       ${ filing_parish1 }
-  - Edit: district_attorney1
+  - Edit: address
     button: |
-      **District attorney:**:
-      ${ district_attorney1 }
+      **Address:**:
+      ${ address }
+  - Edit: granted_legal_custody
+    button: |
+      **If no, have you been granted legal custody of the child by a court of law?**:
+      ${ granted_legal_custody }
+  - Edit: parent_rights_been_stopped
+    button: |
+      **Have the other parent’s parental rights for the child been stopped by a court of law? NOTE: If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.**:
+      ${ parent_rights_been_stopped }
+  - Edit: child_support_obligations
+    button: |
+      **If yes, are your child support obligations satisfied/up-to-date? If no, Stop. Seek the assistance of an attorney. NOTE: You may have to provide copies of ALL child support orders and summaries.**:
+      ${ child_support_obligations }
 ---
 id: download namechangela
 event: namechangela_download
