@@ -129,89 +129,103 @@ id: RS 13 4751 Petition for name change
 question: |
   RS 13:4751 - Petition for name change
 subquestion: |
-  A. The name of a person may be changed as provided in this Section.
-    B. Whenever any person who has attained the age of majority desires to change his name, he shall present a petition to the district court of the parish of his residence, the parish of his birth, or the parish of venue for the Vital Records Registry, or, in the case of a person incarcerated in a penal institution, to the district court of the parish in which he was sentenced, setting forth the reasons for the desired change.
-    C. If the person desiring such change is a minor or if the parents or parent or the tutor of the minor desire to change the name of the minor:
-    (1) The petition shall be signed by the father and mother of the minor or by the survivor in case one of them be dead.
-    (2) If one parent has been granted custody of the minor by a court of competent jurisdiction, the consent of the other parent is not necessary if the other parent has been served with a copy of the petition and any of the following exists:
-    (a) The other parent has refused or failed to comply with a court order of support for a period of one year.
-    (b) The other parent has failed to support the child for a period of three years after judgment awarding custody to the parent signing the petition.
-    (c) The other parent is not paying support and has refused or failed to visit, communicate, or attempt to communicate with the child without just cause for a period of two years.
-    (d) Repealed by Acts 2001, No. 555, §1.
-    (3) In case the minor has no father or mother living, the petition shall be signed by the tutor or tutrix of the minor and in default of any tutor or tutrix, shall be signed by a special tutor appointed by the judge for that purpose.
-    (4) The petition may be signed by either the mother or the father acting alone if a child has been given a surname which is different from that authorized in R.S. 40:34(B)(1)(a).
-    D.(1) A person who has been convicted of a felony shall not be entitled to petition for a change of name under the provisions of this Section until his sentence has been satisfied. This Subsection shall apply whether the offender is actually imprisoned or on probation or parole.
-    (2) Notwithstanding the provisions of Paragraph (1) of this Subsection or any other provision of law to the contrary, a person convicted of any felony enumerated in R.S. 14:2(B) shall not be entitled to petition for a change of name.
+  
 continue button field: RS_134751__Petition_for_name_change
 ---
-id: Social Security Number
+id: Parent/Guardian Clarification
+field: clarification
 question: |
-  Social Security Number
-fields:
-  - "SSN(###-##-####)": social_security_number
+   Are you the parent of the child whose name you want to change?
+buttons:
+  - "Yes I am": yes
+  - code: |
+      [{'no':"No I'm not"}]
 ---
-id: Parent Guardian Information
+id: Parent/Guardian Information
 question: |
   Parent/Guardian Information
-fields:
-  - "Are you the parent of the child whose name you want to change?": are_you_the_parent
+field: parent_info
+  - "Is the child's other parent living? If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.": are_both_parents_living
     datatype: yesnoradio
-  - "If no, are you the child’s tutor (i.e.  guardian)?": are_you_the_tutor
+  - "Does the other parent agree with changing the child’s name?": parent_agreement
     datatype: yesnoradio
-    show if:
-      variable: are_you_the_parent
-      is: False
-  - "Are both parents of the child living? NOTE: If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.": are_both_parents_living
-    datatype: yesnoradio
-  - "If yes, are they married?": are_they_married
-    datatype: yesnoradio
-    show if:
+    showif:
       variable: are_both_parents_living
       is: True
-  - "Are the parents in agreement with changing the child’s name?": parent_agreement
-    datatype: yesnoradio
-  - "If yes, will the other parent sign the petition for the name change?": will_the_other_parent_sign
+  - "Will the other parent sign the petition for the name change?": will_the_other_parent_sign
     datatype: yesnoradio
     show if:
       variable: parent_agreement
       is: True
-  - "If no, will the other parent provide a letter approving the child’s name change?": will_other_parent_provide_a_letter
+  - "Will the other parent provide a letter approving the child’s name change?": will_other_parent_provide_a_letter
     datatype: yesnoradio
     show if:
       variable: will_the_other_parent_sign
       is: False
-  - "If no, have you been granted legal custody of the child by a court of law?": granted_legal_custody
+  - "Have you been granted legal custody of the child by a court of law?": granted_legal_custody
     datatype: yesnoradio
     show if:
       variable: will_other_parent_provide_a_letter
       is: False
-  - "If yes, has the other parent been served with a copy of the petition? If no, Stop.  Seek the assistance of an attorney.": copy_of_the_petition
+  - "Has the other parent been served with a copy of the petition? If no, Stop.  Seek the assistance of an attorney.": copy_of_the_petition
     datatype: yesnoradio
     show if:
       variable: granted_legal_custody
       is: True
-  - "If yes, does either of the following situations apply: (Check one)": parent_checklist
+  - "Does either of the following situations apply: (Check one)": parent_checklist
     datatype: checkboxes
     choices:
       - 'The other parent has refused or failed to comply with a court order of support for a period of one year.'
       - 'The other parent has failed to support the child for a period of three years after judgment awarding custody to the parent signing the petition.'
       - 'The other parent is not paying support and has refused or failed to visit, communicate, or attempt to communicate with the child without just cause for a period of two years.'
-  - "Have the other parent’s parental rights for the child been stopped by a court of law? NOTE: If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.": parent_rights_been_stopped
+  - "Have the other parent’s parental rights for the child been stopped by a court of law? If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.": parent_rights_been_stopped
     datatype: yesnoradio
     show if:
       variable: copy_of_the_petition
       is: True
+---
+id: Additional Parent/Guardian Information
+question: |
+  Parent/Guardian Information
+field:
   - "Are you incarcerated, on parole, or on probation?": incarcerated_parole_probation
     datatype: yesnoradio
-  - "Have you been convicted of a crime? If yes, stop.  Seek the assistance of an attorney.": convicted
+  - "Have you been convicted of a crime? .": convicted
     datatype: yesnoradio
   - "Are you responsible for paying child support?": paying_child_support
     datatype: yesnoradio
-  - "If yes, are your child support obligations satisfied/up-to-date? If no, Stop. Seek the assistance of an attorney. NOTE: You may have to provide copies of ALL child support orders and summaries.": child_support_obligations
+  - "If yes, are your child support obligations satisfied/up-to-date? You may have to provide copies of ALL child support orders and summaries.": child_support_obligations
     datatype: yesnoradio
     show if:
       variable: paying_child_support
       is: True
+---
+event: stop_screen
+progress: 100
+question: |
+  Sorry, you cannot proceed with this interview.
+subquestion: |
+  To proceed in getting your petition filed, seek legal assistance
+buttons:
+  - Exit: exit
+  - Restart: restart
+---
+mandatory: True
+code: |
+  if clarification == "Yes I am"
+    need(parent_info)
+  elif clarification == "No I'm not"
+    need(stop_screen)
+  elif will_the_other_parent_sign == False
+    need(stop_screen)
+  elif will_other_parent_provide_a_letter
+    need(stop_screen)
+  elif incarcerated_parole_probation == True
+    need(stop_screen)
+  elif convicted == True
+    need(stop_screen)
+  elif child_support_obligations == False
+    need(stop_screen)
 ---
 id: Minor Information
 question: |
