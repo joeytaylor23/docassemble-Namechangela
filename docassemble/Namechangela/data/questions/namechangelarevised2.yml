@@ -26,7 +26,7 @@ data:
   description: |-
     This form is intended for individuals seeking to legally change their first and/or last name who are younger than 18.
   original_form: >-
-    
+
   allowed courts: 
     - "District Court"
   categories:
@@ -57,10 +57,16 @@ code: |
 ---
 objects:
   - new_name: ALPeopleList.using(ask_number=True,target_number=1)
-  - users: ALPeopleList.using(there_are_any=True)
-  - parents: ALPeopleList.using(there_are_any=True)
+  - parents: ALPeopleList.using(there_are_any=True, target_number=1)
   - children: ALPeopleList.using(ask_number=True,target_number=1)
   - court_list: ALCourtLoader.using(file_name='JDCs_by_parish.xlsx')
+---
+question: |
+  Do you have any other parent to tell us about?
+yesno: parents.there_are_any
+hide if:
+  variable: living_status
+  is: False
 ---
 sections:
   - review_namechangela3: Review your answers
@@ -70,23 +76,29 @@ comment: |
   Controls order and branching logic for questions specific to this form
 id: interview_order_namechangela3
 code: |
-  # Set the allowed courts for this interview
+  #Set the allowed courts for this interview
   #allowed_courts = interview_metadata["namechangela3"]["allowed courts"]
   nav.set_section("review_namechangela3")
   user_role = "plaintiff"
   RS_134751__Petition_for_name_change
-  parents.gather()
+  parent_clarification
+  living_status
+  if not (living_status==True):
+    incarcerated_parole_probation
+  elif not (living_status==False and parent_agreement or will_the_other_parent_sign or granted_legal_custody):
+    stop_screen
+  if not (convicted==False or incarcerated_parole_probation or  child_support_obligations==True):
+    stop_screen
+  else:
+    parents.gather()
+  trial_court
   parents[0].phone_number
   parents[0].address.address
-  social_security_number
-  set_progress(60)
-  convicted
-  set_progress(20)
   children.gather()
-  name_change_reason
   new_name.gather()
-  set_progress(40)
+  social_security_number
   trial_court_index
+  set_progress(100)
   interview_order_namechangela3 = True
 ---
 ###################### Main order ######################
@@ -132,108 +144,87 @@ subquestion: |
   
 continue button field: RS_134751__Petition_for_name_change
 ---
-id: Parent/Guardian Clarification
-field: clarification
 question: |
    Are you the parent of the child whose name you want to change?
+field: parent_clarification
 buttons:
-  - "Yes I am": yes
-  - code: |
-      [{'no':"No I'm not"}]
+  - Yes I am:
+      code: |
+        parent_clarification = 'yes'
+action buttons:
+  - label: No I'm not
+    action: stop_screen
 ---
-id: Parent/Guardian Information
+progress: 100
+question: |
+  Sorry, you cannot proceed with this interview.
+subquestion: |
+  To proceed in getting your petition filed, seek legal assistance.
+buttons:
+  - Exit: exit
+  - Restart: restart
+event: stop_screen
+---
+id: parent_info
 question: |
   Parent/Guardian Information
-field: parent_info
-  - "Is the child's other parent living? If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.": are_both_parents_living
+fields:
+  - "Is the child's other parent living?": living_status
     datatype: yesnoradio
   - "Does the other parent agree with changing the child’s name?": parent_agreement
     datatype: yesnoradio
-    showif:
-      variable: are_both_parents_living
+    show if:
+      variable: living_status
       is: True
   - "Will the other parent sign the petition for the name change?": will_the_other_parent_sign
     datatype: yesnoradio
     show if:
       variable: parent_agreement
       is: True
-  - "Will the other parent provide a letter approving the child’s name change?": will_other_parent_provide_a_letter
+#  - "Has the other parent been served with a copy of the petition?": copy_of_the_petition
+#    datatype: yesnoradio
+#    show if:
+#      variable: will_the_other_parent_sign
+#      is: True
+  - "Have you been granted legal custody of the child by a court of law?": granted_legal_custody
     datatype: yesnoradio
     show if:
       variable: will_the_other_parent_sign
       is: False
-  - "Have you been granted legal custody of the child by a court of law?": granted_legal_custody
-    datatype: yesnoradio
-    show if:
-      variable: will_other_parent_provide_a_letter
-      is: False
-  - "Has the other parent been served with a copy of the petition? If no, Stop.  Seek the assistance of an attorney.": copy_of_the_petition
-    datatype: yesnoradio
-    show if:
-      variable: granted_legal_custody
-      is: True
-  - "Does either of the following situations apply: (Check one)": parent_checklist
+  - "Does either of the following situations apply. (Check one)": parent_checklist
     datatype: checkboxes
     choices:
       - 'The other parent has refused or failed to comply with a court order of support for a period of one year.'
       - 'The other parent has failed to support the child for a period of three years after judgment awarding custody to the parent signing the petition.'
       - 'The other parent is not paying support and has refused or failed to visit, communicate, or attempt to communicate with the child without just cause for a period of two years.'
-  - "Have the other parent’s parental rights for the child been stopped by a court of law? If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.": parent_rights_been_stopped
-    datatype: yesnoradio
     show if:
-      variable: copy_of_the_petition
+      variable: granted_legal_custody
       is: True
 ---
 id: Additional Parent/Guardian Information
 question: |
   Parent/Guardian Information
-field:
+fields:
   - "Are you incarcerated, on parole, or on probation?": incarcerated_parole_probation
     datatype: yesnoradio
   - "Have you been convicted of a crime? .": convicted
     datatype: yesnoradio
   - "Are you responsible for paying child support?": paying_child_support
     datatype: yesnoradio
-  - "If yes, are your child support obligations satisfied/up-to-date? You may have to provide copies of ALL child support orders and summaries.": child_support_obligations
+  - "Are your child support obligations satisfied/up-to-date? You may have to provide copies of ALL child support orders and summaries.": child_support_obligations
     datatype: yesnoradio
     show if:
       variable: paying_child_support
       is: True
 ---
-event: stop_screen
-progress: 100
-question: |
-  Sorry, you cannot proceed with this interview.
-subquestion: |
-  To proceed in getting your petition filed, seek legal assistance
-buttons:
-  - Exit: exit
-  - Restart: restart
----
-mandatory: True
-code: |
-  if clarification == "Yes I am"
-    need(parent_info)
-  elif clarification == "No I'm not"
-    need(stop_screen)
-  elif will_the_other_parent_sign == False
-    need(stop_screen)
-  elif will_other_parent_provide_a_letter
-    need(stop_screen)
-  elif incarcerated_parole_probation == True
-    need(stop_screen)
-  elif convicted == True
-    need(stop_screen)
-  elif child_support_obligations == False
-    need(stop_screen)
----
 id: Minor Information
 question: |
   Minor Information
 fields:
-  - "Name change reason:": name_change_reason
+  - "SSN:": social_security_number
   - "Birthdate:": child_birthdate
     datatype: date
+  - "Name change reason:": name_change_reason
   - "Domicile:": child_domicile
     input type: dropdown
     choices:
@@ -339,6 +330,7 @@ code: |
   addresses_to_search = [user.address for user in users]
 ---
 id: namechangela3 review screen
+skip undefined: True
 event: review_namechangela3
 question: |
   Review your answers
@@ -347,30 +339,26 @@ review:
     button: |
       **Have you been convicted of a crime? If yes, stop.  Seek the assistance of an attorney..**:
       ${ convicted }
-  - Edit: judicial_district
-    button: |
-      **Judicial district:**:
-      ${ judicial_district }
+#  - Edit: judicial_district
+#    button: |
+#      **Judicial district:**:
+#      ${ judicial_district }
   - Edit: parent_rights_been_stopped
     button: |
       **Have the other parent’s parental rights for the child been stopped by a court of law? NOTE: If the other parent’s rights have been stopped by a court, you will have to provide a copy of the court order.**:
       ${ parent_rights_been_stopped }
-  - Edit: are_both_parents_living
-    button: |
-      **Are both parents of the child living? NOTE: If the other parent is deceased, you may have to provide a Death Certificate or other proof of death.**:
-      ${ are_both_parents_living }
   - Edit: child_support_obligations
     button: |
-      **If yes, are your child support obligations satisfied/up-to-date? If no, Stop. Seek the assistance of an attorney. NOTE: You may have to provide copies of ALL child support orders and summaries.**:
+      **Are your child support obligations satisfied/up-to-date? If no, Stop. Seek the assistance of an attorney. NOTE: You may have to provide copies of ALL child support orders and summaries.**:
       ${ child_support_obligations }
   - Edit: will_the_other_parent_sign
     button: |
-      **If yes, will the other parent sign the petition for the name change?**:
+      **Will the other parent sign the petition for the name change?**:
       ${ will_the_other_parent_sign }
-  - Edit: filing_parish
-    button: |
-      **Filing parish:**:
-      ${ filing_parish }
+#  - Edit: filing_parish
+#    button: |
+#      **Filing parish:**:
+#      ${ filing_parish }
   - Edit: will_other_parent_provide_a_letter
     button: |
       **If no, will the other parent provide a letter approving the child’s name change?**:
@@ -405,10 +393,10 @@ review:
     button: |
       **If yes, are they married?**:
       ${ are_they_married }
-  - Edit: district_attorney
-    button: |
-      **District attorney:**:
-      ${ district_attorney }
+#  - Edit: district_attorney
+#    button: |
+#      **District attorney:**:
+#      ${ district_attorney }
   - Edit: social_security_number
     button: |
       **SSN(###-##-####):**:
@@ -521,7 +509,7 @@ event: namechangela3_download
 question: |
   All done
 subquestion: |
-  Thank you ${users}. Your form is ready to download and deliver.
+  Thank you ${parents}. Your form is ready to download and deliver.
   
   View, download and send your form below. Click the "Edit answers" button to fix any mistakes.
 
@@ -537,26 +525,30 @@ progress: 100
 ---
 # ALDocument objects specify the metadata for each template
 objects:
-  - namechangela3_Post_interview_instructions: ALDocument.using(title="Instructions", filename="namechangelarevised2_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
+#  - namechangela3_Post_interview_instructions: ALDocument.using(title="Instructions", filename="namechangelarevised2_next_steps.docx", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
   - namechangela3_attachment: ALDocument.using(title="Name Change of a Minor in Louisiana", filename="namechangela3", enabled=True, has_addendum=False, default_overflow_message=AL_DEFAULT_OVERFLOW_MESSAGE)
 ---
 # Bundles group the ALDocuments into separate downloads, such as for court and for the user
 objects:
-  - al_user_bundle: ALDocumentBundle.using(elements=[namechangelarevised2_Post_interview_instructions, namechangela3_attachment], filename="namechangela3", title="All forms to download for your records", enabled=True)
+  - al_user_bundle: ALDocumentBundle.using(elements=[namechangela3_attachment], filename="namechangela3", title="All forms to download for your records", enabled=True)
   - al_court_bundle: ALDocumentBundle.using(elements=[namechangela3_attachment],  filename="namechangela3", title="All forms to deliver to court", enabled=True)
 ---
 # Each attachment defines a key in an ALDocument. We use `i` as the placeholder here so the same template is 
 # used for "preview" and "final" keys, and logic in the template checks the value of 
 # `i` to show or hide the user's signature
 attachments:
-  - name: Post-interview-Instructions
-    filename: namechangelarevised2_next_steps
-    docx template file: namechangelarevised2_next_steps.docx
-    variable name: namechangelarevised2_Post_interview_instructions[i]
+#  - name: Post-interview-Instructions
+#    filename: namechangelarevised2_next_steps
+#    docx template file: namechangelarevised2_next_steps.docx
+#    variable name: namechangelarevised2_Post_interview_instructions[i]
   - name: namechangela3
     filename: namechangela3
     variable name: namechangela3_attachment[i]
     skip undefined: True
     docx template file: namechangela3.docx
+    fields:
+      - "filing_parish": ${ trial_court.name }
+      - "judicial_district": ${ trial_court.judicial_district }
+      - "district_attorney": ${ trial_court.district_attorney }
 
 
